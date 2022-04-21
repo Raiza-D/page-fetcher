@@ -8,7 +8,8 @@ const fs = require("fs");
 let userInput = process.argv.slice(2);
 // console.log(userInput);
 
-request(userInput[0], (error, response, body) => {
+request(userInput[0], (error, response) => {
+  // console.log("This is the response.body: ", response.body);
   if (error) {
     console.log(error);
     return;
@@ -16,8 +17,8 @@ request(userInput[0], (error, response, body) => {
   // console.log("Reponse is: ", response && response.statusCode);
   // console.log("Body: ", body);
 
-  let content = body;
-  fs.writeFile(userInput[1], content, err => {
+  // let content = response.body; // Redundant. 
+  fs.writeFile(userInput[1], response.body, (err) => {
     if (err) {
       console.log("Failed to write to file ", err);
       return;
@@ -28,12 +29,35 @@ request(userInput[0], (error, response, body) => {
         return;
       }
       let fileSize = stats.size;
+      console.log(response.body.length); // or content.length // body.length
       console.log(`Downloaded and saved ${fileSize} bytes to ${userInput[1]}`);
+      // Alternative: console.log(`Downloaded and saved ${body.length} bytes to ${userInput[1]}`);
     })
   });
 });
 
+/* Error first principle
+General rule to follow ES6
+Callback functions first parameter should always be an error.
+Know the status of the callback.
+Helps to know or anticipate what hte function give back to us.
 
+process.stdin.on() === > waits for user's input
+What is your name?
+Wait for response from user. Then you use the proces.stdin.on()
+
+Environment variables
+
+Array helper methods that use callbackfunctions, 
+Native JS data types or native JS functions do not follow above principle.
+
+
+Sync functions have NO callbacks.
+Async functions ALWAYS have CALLBACKS. That's how you can tell them apart from sync functions.
+Unless developer didn't write it properly.
+Check DOCUMENTATION to check if a function is async or not.
+
+*/
 /*
 Take command line arguments:
 1. URL
